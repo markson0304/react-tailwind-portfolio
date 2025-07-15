@@ -11,24 +11,117 @@ import {
 import { cn } from "@/lib/utils";
 import { useToast } from "../hooks/use-toast";
 import { useState } from "react";
+import emailjs from '@emailjs/browser';
+
+// Initialize EmailJS
+emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
 
 export const ContactSection = () => {
     const { toast } = useToast()
     const [isSubmitting,  setIsSubmitting] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
-
         setIsSubmitting(true)
 
-        setTimeout(() =>{
+        try {
+            // EmailJS configuration from environment variables
+            const serviceID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+            const notificationTemplateID = import.meta.env.VITE_EMAILJS_NOTIFICATION_TEMPLATE_ID;
+            const autoReplyTemplateID = import.meta.env.VITE_EMAILJS_AUTO_REPLY_TEMPLATE_ID;
+            const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+            // Debug: Check if environment variables are loaded
+            console.log('EmailJS Config:', {
+                serviceID,
+                notificationTemplateID,
+                autoReplyTemplateID,
+                publicKey: publicKey ? 'Found' : 'Missing'
+            });
+
+            // Also log raw environment variables
+            console.log('Raw env vars:', {
+                'VITE_EMAILJS_SERVICE_ID': import.meta.env.VITE_EMAILJS_SERVICE_ID,
+                'VITE_EMAILJS_NOTIFICATION_TEMPLATE_ID': import.meta.env.VITE_EMAILJS_NOTIFICATION_TEMPLATE_ID,
+                'VITE_EMAILJS_AUTO_REPLY_TEMPLATE_ID': import.meta.env.VITE_EMAILJS_AUTO_REPLY_TEMPLATE_ID,
+                'VITE_EMAILJS_PUBLIC_KEY': import.meta.env.VITE_EMAILJS_PUBLIC_KEY ? 'Found' : 'Missing'
+            });
+
+            const formData = new FormData(e.target);
+            const currentTime = new Date().toLocaleString('zh-TW', {
+                timeZone: 'Asia/Taipei',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            // Check if all required config exists
+            if (!serviceID || !notificationTemplateID || !autoReplyTemplateID) {
+                throw new Error('Missing EmailJS configuration');
+            }
+
+            // Template params for notification email (to you)
+            const notificationParams = {
+                name: formData.get('name'),
+                from_name: formData.get('name'),
+                from_email: formData.get('email'),
+                email: formData.get('email'),
+                message: formData.get('message'),
+                to_email: 'markson0304@gmail.com',
+                submission_time: currentTime,
+                time: currentTime
+            };
+
+            // Template params for auto-reply email (to sender)
+            const autoReplyParams = {
+                name: formData.get('name'),
+                from_name: formData.get('name'),
+                from_email: 'markson0304@gmail.com', // Your email as sender
+                email: 'markson0304@gmail.com',
+                message: formData.get('message'),
+                to_email: formData.get('email'), // Send to the person who filled the form
+                to_name: formData.get('name'),
+                submission_time: currentTime,
+                time: currentTime
+            };
+
+            console.log('Notification params:', notificationParams);
+            console.log('Auto-reply params:', autoReplyParams);
+
+            // Send notification email to you first
+            console.log('Sending notification email to markson0304@gmail.com...');
+            await emailjs.send(serviceID, notificationTemplateID, notificationParams);
+            
+            // Send auto-reply email to the sender
+            console.log(`Sending auto-reply email to ${formData.get('email')}...`);
+            await emailjs.send(serviceID, autoReplyTemplateID, autoReplyParams);
+            
             toast({
                 title: "Message sent!",
                 description: "Thank you for your message. I'll get back to you soon.",
             })
+            
+            // Reset form
+            e.target.reset();
+            
+        } catch (error) {
+            console.error('Email sending failed:', error);
+            console.error('Error details:', {
+                status: error.status,
+                text: error.text,
+                message: error.message
+            });
+            
+            toast({
+                title: "Failed to send message",
+                description: `Error: ${error.text || error.message || 'Unknown error'}. Please try again.`,
+                variant: "destructive"
+            })
+        } finally {
             setIsSubmitting(false)
-        }, 1500)
-
+        }
     }
     return (
         <section id="contact" className="py-24 px-4 relative bg-secondary/30">
@@ -98,13 +191,10 @@ export const ContactSection = () => {
                         </div>
                     </div>
 
-                    <div 
-                        className="bg-card p-8 rounded-lg shadow-xs" 
-                        onSubmit={handleSubmit}
-                    >
+                    <div className="bg-card p-8 rounded-lg shadow-xs">
                         <h3 className="text-2xl font-semibold mb-6">Send a Message</h3>
 
-                        <form className="space-y-6">
+                        <form className="space-y-6" onSubmit={handleSubmit}>
                             <div>
                                 <label 
                                     htmlFor="name"
@@ -134,7 +224,7 @@ export const ContactSection = () => {
                                 <input
                                     type="email"
                                     id="email"
-                                    name="eamil"
+                                    name="email"
                                     required
                                     className="w-full px-4 py-3 rounded-md border border-input bg-background focus:outline-hidden focus:ring-2 focus:ring-primary"
                                     placeholder="Markson0304@gmail.com"

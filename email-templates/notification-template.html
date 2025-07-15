@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新訊息通知</title>
+</head>
+<body style="margin: 0; padding: 20px; background-color: #f5f5f5;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <div style="padding: 30px; font-family: system-ui, sans-serif, Arial; font-size: 12px;">
+            <!-- Header -->
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #2c3e50; font-size: 24px; margin: 0;">新的聯絡訊息</h1>
+                <p style="color: #7f8c8d; font-size: 14px; margin: 10px 0 0 0;">來自你的作品集網站</p>
+            </div>
+            
+            <!-- Main Message -->
+            <div style="margin-bottom: 30px;">
+                <p style="color: #2c3e50; font-size: 16px; margin: 0;">A message by <strong>{{from_name}}</strong> has been received. Kindly respond at your earliest convenience.</p>
+            </div>
+            
+            <!-- Message Content -->
+            <div style="margin-top: 20px; padding: 15px 0; border-width: 1px 0; border-style: dashed; border-color: lightgrey;">
+                <table role="presentation" style="width: 100%; border-collapse: collapse;">
+                    <tbody>
+                        <tr>
+                            <td style="vertical-align: top; width: 60px;">
+                                <div style="padding: 6px 10px; margin: 0 10px; background-color: aliceblue; border-radius: 5px; font-size: 26px; text-align: center;" role="img">👤</div>
+                            </td>
+                            <td style="vertical-align: top; padding-left: 15px;">
+                                <div style="color: #2c3e50; font-size: 16px; margin-bottom: 5px;"><strong>{{from_name}}</strong></div>
+                                <div style="color: #cccccc; font-size: 13px; margin-bottom: 15px;">{{submission_time}}</div>
+                                <div style="color: #7f8c8d; font-size: 12px; margin-bottom: 10px;">
+                                    <strong>Email:</strong> {{from_email}}
+                                </div>
+                                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; border-left: 4px solid #3498db;">
+                                    <p style="font-size: 16px; line-height: 1.5; margin: 0; color: #2c3e50;">{{message}}</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Action Button -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="mailto:{{from_email}}?subject=Re: 關於您的聯絡訊息&body=親愛的 {{from_name}}，%0A%0A感謝您的聯絡..." 
+                   style="display: inline-block; background-color: #3498db; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: bold;">
+                    立即回覆
+                </a>
+            </div>
+            
+            <!-- Footer -->
+            <div style="border-top: 1px solid #eee; padding-top: 20px; margin-top: 30px; text-align: center;">
+                <p style="color: #95a5a6; font-size: 12px; margin: 0;">
+                    此郵件由你的作品集網站自動發送<br>
+                    <strong>Markson Chen Portfolio</strong><br>
+                    📧 markson0304@gmail.com | 📱 (886)918-010-790 | 📍 Taipei, Taiwan
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
