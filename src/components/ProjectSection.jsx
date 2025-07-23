@@ -61,7 +61,7 @@ const projects = [
     id: 4,
     title: "React Portfolio Website",
     description: "Modern, responsive portfolio website built with React and Tailwind CSS. Features dark mode, smooth animations, and optimized performance. Showcases full-stack development skills.",
-    image: "/images/portfolio-site.jpg",
+    image: "/Users/chenguanyu/portfolio_project/image/Portfolio.png",
     tags: ["React", "Tailwind CSS", "Framer Motion", "Vercel"],
     status: "🌐 Live",
     type: "development",
