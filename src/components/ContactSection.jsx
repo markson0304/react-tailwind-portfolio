@@ -8,17 +8,19 @@ import {
     Twitch, 
     Twitter 
 } from "lucide-react"
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 import { useToast } from "../hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import emailjs from '@emailjs/browser';
-
-// Initialize EmailJS
-emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
 
 export const ContactSection = () => {
     const { toast } = useToast()
     const [isSubmitting,  setIsSubmitting] = useState(false);
+
+    // Initialize EmailJS when component mounts
+    useEffect(() => {
+        emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -58,8 +60,8 @@ export const ContactSection = () => {
             });
 
             // Check if all required config exists
-            if (!serviceID || !notificationTemplateID || !autoReplyTemplateID) {
-                throw new Error('Missing EmailJS configuration');
+            if (!serviceID || !notificationTemplateID || !autoReplyTemplateID || !publicKey) {
+                throw new Error('Missing EmailJS configuration. Please check your environment variables.');
             }
 
             // Template params for notification email (to you)
