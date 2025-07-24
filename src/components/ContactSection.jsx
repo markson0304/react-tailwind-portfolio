@@ -33,22 +33,6 @@ export const ContactSection = () => {
             const autoReplyTemplateID = import.meta.env.VITE_EMAILJS_AUTO_REPLY_TEMPLATE_ID;
             const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
-            // Debug: Check if environment variables are loaded
-            console.log('EmailJS Config:', {
-                serviceID,
-                notificationTemplateID,
-                autoReplyTemplateID,
-                publicKey: publicKey ? 'Found' : 'Missing'
-            });
-
-            // Also log raw environment variables
-            console.log('Raw env vars:', {
-                'VITE_EMAILJS_SERVICE_ID': import.meta.env.VITE_EMAILJS_SERVICE_ID,
-                'VITE_EMAILJS_NOTIFICATION_TEMPLATE_ID': import.meta.env.VITE_EMAILJS_NOTIFICATION_TEMPLATE_ID,
-                'VITE_EMAILJS_AUTO_REPLY_TEMPLATE_ID': import.meta.env.VITE_EMAILJS_AUTO_REPLY_TEMPLATE_ID,
-                'VITE_EMAILJS_PUBLIC_KEY': import.meta.env.VITE_EMAILJS_PUBLIC_KEY ? 'Found' : 'Missing'
-            });
-
             const formData = new FormData(e.target);
             const currentTime = new Date().toLocaleString('zh-TW', {
                 timeZone: 'Asia/Taipei',
@@ -61,7 +45,13 @@ export const ContactSection = () => {
 
             // Check if all required config exists
             if (!serviceID || !notificationTemplateID || !autoReplyTemplateID || !publicKey) {
-                throw new Error('Missing EmailJS configuration. Please check your environment variables.');
+                const missingKeys = [];
+                if (!serviceID) missingKeys.push('VITE_EMAILJS_SERVICE_ID');
+                if (!notificationTemplateID) missingKeys.push('VITE_EMAILJS_NOTIFICATION_TEMPLATE_ID');
+                if (!autoReplyTemplateID) missingKeys.push('VITE_EMAILJS_AUTO_REPLY_TEMPLATE_ID');
+                if (!publicKey) missingKeys.push('VITE_EMAILJS_PUBLIC_KEY');
+                
+                throw new Error(`Missing environment variables: ${missingKeys.join(', ')}. Please configure them in your deployment settings.`);
             }
 
             // Template params for notification email (to you)
@@ -89,15 +79,10 @@ export const ContactSection = () => {
                 time: currentTime
             };
 
-            console.log('Notification params:', notificationParams);
-            console.log('Auto-reply params:', autoReplyParams);
-
             // Send notification email to you first
-            console.log('Sending notification email to markson0304@gmail.com...');
             await emailjs.send(serviceID, notificationTemplateID, notificationParams);
             
             // Send auto-reply email to the sender
-            console.log(`Sending auto-reply email to ${formData.get('email')}...`);
             await emailjs.send(serviceID, autoReplyTemplateID, autoReplyParams);
             
             toast({
@@ -110,15 +95,10 @@ export const ContactSection = () => {
             
         } catch (error) {
             console.error('Email sending failed:', error);
-            console.error('Error details:', {
-                status: error.status,
-                text: error.text,
-                message: error.message
-            });
             
             toast({
                 title: "Failed to send message",
-                description: `Error: ${error.text || error.message || 'Unknown error'}. Please try again.`,
+                description: `${error.message || error.text || 'Unknown error occurred'}. Please try again.`,
                 variant: "destructive"
             })
         } finally {
